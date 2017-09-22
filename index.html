@@ -16,6 +16,7 @@
         <button type="button" class="btn btn-default" id="draw2Cards">Draw 2 Cards</button>
         <button type="button" class="btn btn-default" id="draw4Cards">Draw 4 Cards</button>
         <button type="button" class="btn btn-default" id="draw7Cards">Draw 7 Cards</button>
+        <button type="button" class="btn btn-default" id="unoCall">Call Uno</button>
         <button type="button" class="btn btn-default" id="undoCard">Undo Card</button>
     </div>
     
@@ -37,13 +38,6 @@
     </div>
     
     <br>
-    
-    <!--
-    <img class="red" src="https://i.imgur.com/CnFGFS0.jpg">
-    <img class="green" src="https://i.imgur.com/CnFGFS0.jpg">
-    <img class="blue" src="https://i.imgur.com/CnFGFS0.jpg">
-    <img class="yellow" src="https://i.imgur.com/CnFGFS0.jpg">
-    -->
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -68,18 +62,24 @@
         });
         
         $("#draw2Cards").click(function() {
-            socket.emit('card get 2');
+            socket.emit('card get x', 2);
             console.log("Draw Card 2 Button Clicked -- Client");
         });
         
         $("#draw4Cards").click(function() {
-            socket.emit('card get 4');
+            socket.emit('card get x', 4);
             console.log("Draw Card 4 Button Clicked -- Client");
         });
         
         $("#draw7Cards").click(function() {
-            socket.emit('card get 7');
+            socket.emit('card get x', 7);
             console.log("Draw Card 7 Button Clicked -- Client");
+        });
+        
+        // Call uo
+        $("#unoCall").click(function() {
+            socket.emit('call uno');
+            console.log("Uno Call Button Clicked -- Client");
         });
         
         // Undo Card
@@ -89,12 +89,10 @@
         });
         
         socket.on('card get', function(card){
-            //console.log(card);
             var tempCard = $('<li>').text(JSON.stringify(card));
             tempCard.addClass("list-group-item");
             var tempColor = getColor(card);
             var tempUrl = getURL(card);
-            //console.log(tempUrl);
             var tempImageString = '<img class="' + tempColor + '" src="' + tempUrl +  '" alt=' + JSON.stringify(card) + '>';
             var tempImage = $(tempImageString);
             $(tempCard).append(tempImage);
@@ -105,7 +103,6 @@
                 } else {
                     var tempLi = e.target;
                 }
-                //console.log(JSON.parse(tempLi.innerText));
                 socket.emit('card play', JSON.parse(tempLi.innerText));
                 tempLi.remove();
                 victoryCheck();
@@ -171,6 +168,7 @@
             } else if (document.getElementById("cards").children.length == 0) {
                 socket.emit('victory');
             } else {
+            
             }
         }
       });

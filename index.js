@@ -44,33 +44,15 @@ io.on('connection', function(socket){
         socket.emit('card get', tempCard);
     });
     
-    socket.on('card get 2', function(msg){
-        for (var i = 0; i < 2; i++) {
+    socket.on('card get x', function(x) {
+        for (var i = 0; i < x; i++) {
             var tempCard = cardDrawHandler();
             socket.emit('card get', tempCard);
         }
         
-        io.emit('message', socket.username + " drew 2 cards.");
+        io.emit('message', socket.username + " drew " + x + " cards.");
     });
-    
-    socket.on('card get 4', function(msg){
-        for (var i = 0; i < 4; i++) {
-            var tempCard = cardDrawHandler();
-            socket.emit('card get', tempCard);
-        }
-        
-        io.emit('message', socket.username + " drew 4 cards.");
-    });
-    
-    socket.on('card get 7', function(msg){
-        for (var i = 0; i < 7; i++) {
-            var tempCard = cardDrawHandler();
-            socket.emit('card get', tempCard);
-        }
-        
-        io.emit('message', socket.username + " drew 7 cards.");
-    });
-      
+
     socket.on('card play', function(card){
         if (card == undefined) {
             return;
@@ -107,6 +89,10 @@ io.on('connection', function(socket){
         //cardUndoHandler();
     });
     
+    socket.on('call uno', function() {
+        io.emit('message', socket.username + " has called Uno!");
+    });
+    
     socket.on('uno', function() {
         io.emit('message', socket.username + " has Uno!");
     });
@@ -128,10 +114,6 @@ function cardDrawHandler() {
     return tempCard;
 }
 
-/*function cardPlayHandler() {
-    console.log("Play Card Button Clicked -- Server");
-}*/
-
 function cardUndoHandler() {
     console.log("Undo Card Button Clicked -- Server");
 }
@@ -143,7 +125,7 @@ function deckHandler() {
     var values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, "skip", "skip", "reverse", "reverse", "wild", "wild","draw two", "draw two", "draw four"];
     for (var i = 0; i < colors.length; i++) {
         for (var j = 0; j < values.length; j++) {
-            tempDeck.push(new UnoCard(values[j], colors[i]));
+            tempDeck.push({"value": values[j], "color": colors[i]});
         }
     }
     shuffle(tempDeck);
@@ -164,10 +146,3 @@ function shuffle(a) {
 http.listen(3030, function(){
   console.log('listening on *:3030');
 });
-
-class UnoCard {
-    constructor(value, color) {
-        this.value = value;
-        this.color = color;
-    }
-}
