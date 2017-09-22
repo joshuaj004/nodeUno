@@ -1,0 +1,37 @@
+ul {
+    max-height: 400px;
+    overflow: auto;
+}
+
+#cards > li {
+    font-size : 0px;
+    display: inline-block;
+}
+
+li > img {
+    width: 100px;
+    height: 155px;
+}
+
+body {
+    padding: 25px;
+}
+
+.red {
+
+}
+
+.green {
+    -webkit-filter: hue-rotate(120deg);
+    filter: hue-rotate(120deg);
+}
+
+.blue {
+    -webkit-filter: hue-rotate(210deg);
+    filter: hue-rotate(210deg);
+}
+
+.yellow {
+    -webkit-filter: hue-rotate(40deg);
+    filter: hue-rotate(40deg);
+}
