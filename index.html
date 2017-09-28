@@ -10,6 +10,10 @@
         <h1>Josh's Uno Bonanza <small>Pls don't tell Mattel or they'll totally sue me</small></h1>
     </div>
     
+    <style>      
+    #messages li:nth-child(even) { background: #eee; }
+    </style>
+    
     <div class="btn-group" role="group" aria-label="...">
         <button type="button" class="btn btn-default" id="newGame">New Game</button>
         <button type="button" class="btn btn-default" id="drawCard">Draw Card</button>
@@ -76,7 +80,7 @@
             console.log("Draw Card 7 Button Clicked -- Client");
         });
         
-        // Call uo
+        // Call uno
         $("#unoCall").click(function() {
             socket.emit('call uno');
             console.log("Uno Call Button Clicked -- Client");

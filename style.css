@@ -17,6 +17,10 @@ body {
     padding: 25px;
 }
 
+#messages li:nth-child(odd) { 
+    background: red; 
+}
+
 .red {
 
 }

@@ -7,10 +7,6 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
-//app.get('/style.css', function(req, res) {
-//  res.sendFile(__dirname + "/" + "style.css");
-//});
-
 app.use(express.static('assets'));
 app.use(express.static('public'));
 
@@ -143,6 +139,7 @@ function shuffle(a) {
     }
 }
 
-http.listen(3030, function(){
-  console.log('listening on *:3030');
+var port = process.env.PORT || 3030; //which you can run both on Azure or local
+http.listen(process.env.PORT||3030, function() {
+  console.log('listening on *:' + port);
 });
