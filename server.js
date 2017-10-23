@@ -32,10 +32,12 @@ io.on('connection', function(socket){
         playedCards.push(tempCard);
         if (tempCard.value == "wild" || tempCard.value == "draw four") {
 
-            // Change wild card color to color of player's choice
-
-            io.emit('message', "The current card is a " + tempCard.value + ". The color is now " + tempCard.color + ".");
+            // Change wild card color to color of player's choice (player who started new game).
             io.emit('display card', tempCard);
+            socket.on('change color', function(color) {
+                tempCard.color = color;
+                io.emit('message', "The curent card is a " + tempCard.value + ". The color is now " + tempCard.color + ".");
+            }); 
         } else {
             io.emit('message', "The current card is a " + tempCard.color + " " + tempCard.value + ".");
             io.emit('display card', tempCard);
@@ -69,7 +71,7 @@ io.on('connection', function(socket){
             card.value == "wild" || card.value == "draw four") {
             playedCards.push(card);
         } else {
-            // Cards was not valid
+            // Card was not valid
             io.emit('message', socket.username + " tried to play a " + card.color + " " + card.value + ", an action deemed invalid. Card was returned to hand.");
             socket.emit('card get', card);
             return;
