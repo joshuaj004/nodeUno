@@ -30,8 +30,18 @@ io.on('connection', function(socket){
         unoDeck = deckHandler();
         var tempCard = unoDeck.pop();
         playedCards.push(tempCard);
-        io.emit('message', "The current card is " + JSON.stringify(tempCard));
-        io.emit('display card', tempCard);
+        if (tempCard.value == "wild" || tempCard.value == "draw four") {
+
+            // Change wild card color to color of player's choice (player who started new game).
+            io.emit('display card', tempCard);
+            socket.on('change color', function(color) {
+                tempCard.color = color;
+                io.emit('message', "The curent card is a " + tempCard.value + ". The color is now " + tempCard.color + ".");
+            }); 
+        } else {
+            io.emit('message', "The current card is a " + tempCard.color + " " + tempCard.value + ".");
+            io.emit('display card', tempCard);
+        }
     });
     
     socket.on('card get', function(msg){
@@ -55,22 +65,33 @@ io.on('connection', function(socket){
         }
         
         var lastPlayed = playedCards.slice(-1)[0];
-        
-        // Handle Wild Scenarios
-        if (lastPlayed.value == "wild" || lastPlayed.value == "draw four" || card.value == "wild" || card.value == "draw four" ) {
-            playedCards.push(card);
-        } else if (lastPlayed.value == card.value || lastPlayed.color == card.color) {
-            // Handle matching values or colors
+
+        // Handle matching values, colors, or wild cards
+        if (lastPlayed.value == card.value || lastPlayed.color == card.color || 
+            card.value == "wild" || card.value == "draw four") {
             playedCards.push(card);
         } else {
-            // Cards was not valid
-            io.emit('message', socket.username + " tried to play a " + JSON.stringify(card) + ", an action deemed invalid. Card was returned to hand.");
+            // Card was not valid
+            io.emit('message', socket.username + " tried to play a " + card.color + " " + card.value + ", an action deemed invalid. Card was returned to hand.");
             socket.emit('card get', card);
             return;
         }
-        io.emit('message', socket.username + " played a " + JSON.stringify(card));
-        io.emit('display card', card);
-        //cardPlayHandler();
+        
+        // Handle message if wild card or not
+        if (card.value == "wild" || card.value == "draw four") {
+            io.emit('display card', card);
+            // Changes wild card color to color of player's choice
+            // in order to match next played card to chosen color.
+            // Called from index.html 'display card' method.
+            socket.on('change color', function(color) {
+                card.color = color;
+                io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
+            });            
+        } else {
+            io.emit('message', socket.username + " played a " + card.color + " " + card.value + ".");
+            io.emit('display card', card);
+            //cardPlayHandler();
+        }
     });
       
     socket.on('card undo', function(){
@@ -79,7 +100,7 @@ io.on('connection', function(socket){
         } else {
             var undoCard = playedCards.pop();
             socket.emit('card get', undoCard);
-            io.emit('message', socket.username + " selected undo and the card " + JSON.stringify(undoCard) + " was returned to hand.");
+            io.emit('message', socket.username + " selected undo and the " + undoCard.color + " " + undoCard.value + " was returned to hand.");
             io.emit('display card', playedCards.slice(-1)[0]);
         }
         //cardUndoHandler();
@@ -98,6 +119,19 @@ io.on('connection', function(socket){
         io.emit('card clear');
     });
 });
+
+/*
+function changeColor() {
+    var color = prompt("What color?");
+    color = color.toLowerCase();
+    while (color != "red" || color != "blue" || color != "green" || color != "yellow") {
+        color = prompt("Pick a proper color you ass.");
+        color = color.toLowerCase();
+    }
+    return color;
+}
+*/
+
 
 // This function handles drawing a card and returning it to the player
 function cardDrawHandler() {

@@ -121,6 +121,26 @@
             var tempImage = $(tempImageString);
             $('#imageContainer').empty();
             $('#imageContainer').append(tempImage);
+
+            // Prompts the user to pick a color on wild card.
+            // Sends to server to persist change.
+            if (card.value == "wild" || card.value == "draw four") {
+                var color = prompt('What color?')
+                if (color == null) {
+                    socket.emit('change color', card.color);
+                    return;
+                }
+                color = color.toLowerCase();
+                while (color != "red" && color != "blue" && color != "green" && color != "yellow") {
+                    color = prompt("Pick a proper color you ass.");
+                    if (color == null) {
+                        socket.emit('change color', card.color);
+                        return;
+                    }
+                    color = color.toLowerCase();
+                }
+                socket.emit('change color', color);
+            }
         });
         
         socket.on('message', function(msg){
