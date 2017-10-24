@@ -1,1 +1,5 @@
 node_modules
+ngrok.exe
+node.php
+npm-debug.log
+style old.css

@@ -13,6 +13,10 @@ app.use(express.static('public'));
 var unoDeck = [];
 var playedCards = [];
 
+// Helpful Comment:
+// io talks to everybody connected to the server
+// socket.emit should only talk to the connected socket (player)
+
 io.on('connection', function(socket){
     socket.on('new user', function(name) {
         io.emit('message', name + ' has connected.');
