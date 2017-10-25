@@ -13,6 +13,10 @@ app.use(express.static('public'));
 var unoDeck = [];
 var playedCards = [];
 
+// Helpful Comment:
+// io talks to everybody connected to the server
+// socket.emit should only talk to the connected socket (player)
+
 io.on('connection', function(socket){
     socket.on('new user', function(name) {
         io.emit('message', name + ' has connected.');
@@ -83,10 +87,11 @@ io.on('connection', function(socket){
             // Changes wild card color to color of player's choice
             // in order to match next played card to chosen color.
             // Called from index.html 'display card' method.
-            socket.on('change color', function(color) {
-                card.color = color;
-                io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
-            });            
+            //socket.on('change color', function(color) {
+                //card.color = color;
+                //io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
+            //});            
+            io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
         } else {
             io.emit('message', socket.username + " played a " + card.color + " " + card.value + ".");
             io.emit('display card', card);
