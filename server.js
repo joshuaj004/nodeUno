@@ -87,10 +87,11 @@ io.on('connection', function(socket){
             // Changes wild card color to color of player's choice
             // in order to match next played card to chosen color.
             // Called from index.html 'display card' method.
-            socket.on('change color', function(color) {
-                card.color = color;
-                io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
-            });            
+            //socket.on('change color', function(color) {
+                //card.color = color;
+                //io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
+            //});            
+            io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
         } else {
             io.emit('message', socket.username + " played a " + card.color + " " + card.value + ".");
             io.emit('display card', card);

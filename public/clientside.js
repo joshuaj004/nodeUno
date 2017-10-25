@@ -1,9 +1,31 @@
-var username = prompt('Enter your name');
-
 $(function () {
     var socket = io();
     // Handle username
-    socket.emit('new user', username);
+    swal({
+        title: 'What is your name?',
+        input: 'text',
+        inputPlaceholder: 'Enter your name or nickname',
+        showCancelButton: true,
+        inputValidator: function (value) {
+            return new Promise(function (resolve, reject) {
+                if (value) {
+                    resolve()
+                } else {    
+                    reject('You need to write something!')
+                }
+            })
+        }
+    }).then(function (name) {
+        if (!name) {
+            name = ["Doc", "Grumpy", "Happy", "Sleepy", "Dopey", "Bashful", "Sneezy"][Math.floor(Math.random() * 7)];
+        }
+        username = name;
+        socket.emit('new user', username);
+    }, function(dismiss) {
+        username = ["Doc", "Grumpy", "Happy", "Sleepy", "Dopey", "Bashful", "Sneezy"][Math.floor(Math.random() * 7)];
+        socket.emit('new user', username);
+    })
+    
 
     // New Game
     $("#newGame").click(function() {
@@ -59,9 +81,40 @@ $(function () {
             } else {
                 var tempLi = e.target;
             }
-            socket.emit('card play', JSON.parse(tempLi.innerText));
-            tempLi.remove();
-            victoryCheck();
+            var card = JSON.parse(tempLi.innerText);
+            console.log(card);
+            // Prompts the user to pick a color on wild card.
+            // Sends to server to persist change.
+            if (card.value == "wild" || card.value == "draw four") {
+                swal({
+                    title: 'Select color',
+                    input: 'radio',
+                    inputOptions: {
+                        'red': 'Red',
+                        'green': 'Green',
+                        'blue': 'Blue',
+                        'yellow': 'Yellow'
+                    },
+                    inputValidator: function (result) {
+                        return new Promise(function (resolve, reject) {
+                            if (result) {
+                                resolve()
+                            } else {
+                                reject('You need to select something!')
+                            }
+                        })
+                    }              
+                }).then(function (result) {
+                    card.color = result;
+                    socket.emit('card play', card);
+                    tempLi.remove();
+                    victoryCheck();
+                });
+            } else {
+                socket.emit('card play', card);
+                tempLi.remove();
+                victoryCheck();
+            }
         });
         $('#cards').append(tempCard);
     });
@@ -73,26 +126,6 @@ $(function () {
         var tempImage = $(tempImageString);
         $('#imageContainer').empty();
         $('#imageContainer').append(tempImage);
-
-        // Prompts the user to pick a color on wild card.
-        // Sends to server to persist change.
-        if (card.value == "wild" || card.value == "draw four") {
-            var color = prompt('What color?')
-            if (color == null) {
-                socket.emit('change color', card.color);
-                return;
-            }
-            color = color.toLowerCase();
-            while (color != "red" && color != "blue" && color != "green" && color != "yellow") {
-                color = prompt("Pick a proper color you ass.");
-                if (color == null) {
-                    socket.emit('change color', card.color);
-                    return;
-                }
-                color = color.toLowerCase();
-            }
-            socket.emit('change color', color);
-        }
     });
 
     socket.on('message', function(msg){
@@ -126,7 +159,6 @@ $(function () {
             var cardNum = card.value;
         }
         return "/(" + cardNum + ").jpeg";
-        
     }
 
     function getColor(card) {
