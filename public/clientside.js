@@ -26,6 +26,18 @@ $(function () {
         socket.emit('new user', username);
     })
     
+    $('#messageButton').click(function () {
+            socket.emit('chat message', $('#m').val());
+            $('#m').val('');
+    });
+    
+    $('input').keypress(function (e) {
+        if (e.which == 13) {
+            socket.emit('chat message', $('#m').val());
+            $('#m').val('');
+            return false;
+        }
+    });    
 
     // New Game
     $("#newGame").click(function() {
@@ -131,8 +143,8 @@ $(function () {
     socket.on('message', function(msg){
         var tempLi = $('<li>').text(msg);
         tempLi.addClass("list-group-item");
-      $('#messages').append(tempLi);
-      $('#messages').scrollTop($('#messages')[0].scrollHeight);
+        $('#messages').append(tempLi);
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
     });
 
     socket.on('card clear', function(msg){

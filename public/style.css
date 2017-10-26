@@ -1,6 +1,10 @@
 ul {
-    max-height: 400px;
+    max-height: 350px;
     overflow: auto;
+}
+
+#messageInput {
+    padding-bottom: 25px;
 }
 
 #cards > li {
