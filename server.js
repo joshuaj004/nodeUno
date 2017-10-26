@@ -73,6 +73,8 @@ io.on('connection', function(socket){
         if (lastPlayed.value == card.value || lastPlayed.color == card.color || 
             card.value == "wild" || card.value == "draw four") {
             playedCards.push(card);
+        } else if (lastPlayed.value == "draw four" && card.value == "draw two") {
+            playedCards.push(card);
         } else {
             // Card was not valid
             io.emit('message', socket.username + " tried to play a " + card.color + " " + card.value + ", an action deemed invalid. Card was returned to hand.");
@@ -81,16 +83,9 @@ io.on('connection', function(socket){
         }
         
         // Handle message if wild card or not
-        if (card.value == "wild" || card.value == "draw four") {
-            io.emit('display card', card);
-            // Changes wild card color to color of player's choice
-            // in order to match next played card to chosen color.
-            // Called from index.html 'display card' method.
-            //socket.on('change color', function(color) {
-                //card.color = color;
-                //io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
-            //});            
+        if (card.value == "wild" || card.value == "draw four") {     
             io.emit('message', socket.username + " played a " + card.value + ". The color is now " + card.color + ".");
+            io.emit('display card', card);
         } else {
             io.emit('message', socket.username + " played a " + card.color + " " + card.value + ".");
             io.emit('display card', card);
