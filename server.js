@@ -23,6 +23,10 @@ io.on('connection', function(socket){
         socket.username = name;
     });
     
+    socket.on('chat message', function(msg) {
+        io.emit('message', socket.username + ': ' + msg);
+    });
+    
     socket.on('disconnect', function() {
         io.emit('message', socket.username + ' has disconnected.');
     });
@@ -35,13 +39,8 @@ io.on('connection', function(socket){
         var tempCard = unoDeck.pop();
         playedCards.push(tempCard);
         if (tempCard.value == "wild" || tempCard.value == "draw four") {
-
-            // Change wild card color to color of player's choice (player who started new game).
+            io.emit('message', "The curent card is a " + tempCard.value + " card. The color is " + tempCard.color + ".");
             io.emit('display card', tempCard);
-            socket.on('change color', function(color) {
-                tempCard.color = color;
-                io.emit('message', "The curent card is a " + tempCard.value + ". The color is now " + tempCard.color + ".");
-            }); 
         } else {
             io.emit('message', "The current card is a " + tempCard.color + " " + tempCard.value + ".");
             io.emit('display card', tempCard);
@@ -124,19 +123,6 @@ io.on('connection', function(socket){
         io.emit('card clear');
     });
 });
-
-/*
-function changeColor() {
-    var color = prompt("What color?");
-    color = color.toLowerCase();
-    while (color != "red" || color != "blue" || color != "green" || color != "yellow") {
-        color = prompt("Pick a proper color you ass.");
-        color = color.toLowerCase();
-    }
-    return color;
-}
-*/
-
 
 // This function handles drawing a card and returning it to the player
 function cardDrawHandler() {
