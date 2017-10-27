@@ -26,8 +26,8 @@ io.on('connection', function(socket){
         socket.username = name;
         players.push(socket.id);
         numPlayers++;
-        console.log("Players: " + players);
-        console.log("Number of players: " + numPlayers);
+        // console.log("Players: " + players);
+        // console.log("Number of players: " + numPlayers);
     });
 
     socket.on('chat message', function(msg) {
