@@ -24,10 +24,8 @@ io.on('connection', function(socket){
     socket.on('new user', function(name) {
         io.emit('message', name + ' has connected.');
         socket.username = name;
-        players.push(socket.id);
+        players.push({"id": socket.id, "username": socket.username});
         numPlayers++;
-        // console.log("Players: " + players);
-        // console.log("Number of players: " + numPlayers);
     });
 
     socket.on('chat message', function(msg) {
@@ -36,20 +34,18 @@ io.on('connection', function(socket){
     
     socket.on('disconnect', function() {
         io.emit('message', socket.username + ' has disconnected.');
-        var index = players.indexOf(socket.id);
+        var index = players.findIndex(i => i.id === socket.id);
         players.splice(index, 1);
         numPlayers--;
     });
     
     socket.on('new game', function(){
-        console.log("New Game Button Clicked -- Server");
         io.emit('message', socket.username + " started a new game.");
         // Get a shuffled uno deck
         unoDeck = deckHandler();
         var tempCard = unoDeck.pop();
         playedCards.push(tempCard);
         turns = 0;
-        // console.log("Turns reset: " + turns);
         if (tempCard.value == "wild" || tempCard.value == "draw four") {
             io.emit('message', "The curent card is a " + tempCard.value + " card. The color is " + tempCard.color + ".");
             io.emit('display card', tempCard);
@@ -57,6 +53,7 @@ io.on('connection', function(socket){
             io.emit('message', "The current card is a " + tempCard.color + " " + tempCard.value + ".");
             io.emit('display card', tempCard);
         }
+        whosTurn();
     });
     
     socket.on('card get', function(msg){
@@ -109,11 +106,9 @@ io.on('connection', function(socket){
                 } else if (card.value == "skip") {
                     turns++;
                 }
-                //cardPlayHandler();
             }
             turns++;
-            // console.log("Turns increased: " + turns);
-            // whosTurn();
+            whosTurn();
         } else {
             io.emit('message', socket.username + " attempted to play out of turn.");
             socket.emit('card get', card);
@@ -131,8 +126,6 @@ io.on('connection', function(socket){
             io.emit('display card', playedCards.slice(-1)[0]);
         }
         turns--;
-        // console.log("Turns decreased: " + turns);
-        //cardUndoHandler();
     });
     
     socket.on('call uno', function() {
@@ -151,17 +144,11 @@ io.on('connection', function(socket){
 
 // This function handles drawing a card and returning it to the player
 function cardDrawHandler() {
-    console.log("Draw Card Button Clicked -- Server");
     if (unoDeck.length < 1) {
         unoDeck = deckHandler();
     }
     var tempCard = unoDeck.pop();
-    console.log("The drawn card was -- " + JSON.stringify(tempCard));
     return tempCard;
-}
-
-function cardUndoHandler() {
-    console.log("Undo Card Button Clicked -- Server");
 }
 
 // Creates and returns a full Uno deck
@@ -179,14 +166,13 @@ function deckHandler() {
 }
 
 function isPlayerTurn(id) {
-    return id == players[turns % numPlayers];
+    return id === players[turns % numPlayers].id;
 }
 
-// function whosTurn() {
-//     if (socket.id == players[turns % numPlayers]) {
-//         io.emit('message', socket.username + "'s turn.");
-//     }
-// }
+function whosTurn() {
+    var user = players[turns % numPlayers].username;
+    io.emit('message', user + "'s turn.");
+}
 
 /**
  * Shuffles array in place. ES6 version
