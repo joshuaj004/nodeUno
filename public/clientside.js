@@ -42,40 +42,33 @@ $(function () {
     // New Game
     $("#newGame").click(function() {
         socket.emit('new game');
-        console.log('New Game Button Clicked -- Client');
     });
 
     // Draw cards
     $("#drawCard").click(function() {
         socket.emit('card get');
-        console.log("Draw Card Button Clicked -- Client");
     });
 
     $("#draw2Cards").click(function() {
         socket.emit('card get x', 2);
-        console.log("Draw Card 2 Button Clicked -- Client");
     });
 
     $("#draw4Cards").click(function() {
         socket.emit('card get x', 4);
-        console.log("Draw Card 4 Button Clicked -- Client");
     });
 
     $("#draw7Cards").click(function() {
         socket.emit('card get x', 7);
-        console.log("Draw Card 7 Button Clicked -- Client");
     });
 
     // Call uno
     $("#unoCall").click(function() {
         socket.emit('call uno');
-        console.log("Uno Call Button Clicked -- Client");
     });
 
     // Undo Card
     $("#undoCard").click(function() {
         socket.emit('card undo');
-        console.log("Undo Card Button Clicked -- Client");
     });
 
     socket.on('card get', function(card){
@@ -151,6 +144,10 @@ $(function () {
        $('#cards').empty(); 
     });
 
+    /**
+     * Returns the corresponding number of the card to determine the image URL.
+     * @param {Object} card 
+     */
     function getURL(card) {
         if (isNaN(card.value)) {
             if (card.value == 'reverse') {
@@ -173,6 +170,10 @@ $(function () {
         return "/(" + cardNum + ").jpeg";
     }
 
+    /**
+     * Returns the card's color.
+     * @param {Object} card 
+     */
     function getColor(card) {
         if (card.value != "wild" && card.value != "draw four") {
             return card.color;
@@ -181,7 +182,9 @@ $(function () {
         }
     }
 
-    // Checks if the game was won.
+    /**
+     * Checks if the game was won.
+     */
     function victoryCheck() {
         if (document.getElementById("cards").children.length == 1) {
             socket.emit('uno');
