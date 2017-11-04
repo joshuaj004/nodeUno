@@ -30,6 +30,10 @@ io.on('connection', function(socket){
         players.push({"id": socket.id, "username": socket.username});
         if (turns > 0) {
             io.emit('disable new game button');
+            whosTurn();
+            
+            var lastPlayed = playedCards.slice(-1)[0];
+            socket.emit('display card', lastPlayed);
         }
     });
 
@@ -49,9 +53,13 @@ io.on('connection', function(socket){
 
             io.emit('disable draw buttons');
     
+            io.emit('enable new/draw7 buttons');
+
             // Could combine these two into their own function. Note for later.
-            io.emit('enable draw 7 button');
-            io.emit('enable new game button');
+            // io.emit('enable draw 7 button');
+            // io.emit('enable new game button');
+        } else {
+            whosTurn();
         }
     });
     
@@ -235,9 +243,11 @@ io.on('connection', function(socket){
         io.emit('card clear');
         io.emit('disable draw buttons');
 
+        io.emit('enable new/draw7 buttons');
+
         // Could combine these two into their own function. Note for later.
-        io.emit('enable draw 7 button');
-        io.emit('enable new game button');
+        // io.emit('enable draw 7 button');
+        // io.emit('enable new game button');
 
         turns = 0;
         drawTotal = 0;
@@ -286,6 +296,7 @@ function isPlayerTurn(id) {
 function whosTurn() {
     var player = players[turns % numPlayers];
     io.emit('message', player.username + "'s turn.");
+    io.emit('disable new game button');
     io.emit('disable draw buttons');
     io.to(player.id).emit('enable draw buttons');
 }
