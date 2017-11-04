@@ -29,11 +29,8 @@ io.on('connection', function(socket){
         socket.username = name;
         players.push({"id": socket.id, "username": socket.username});
         if (turns > 0) {
-            socket.emit('disable new game button');
+            io.emit('disable new game button');
         }
-        // if (!isPlayerTurn(socket.id)) {
-        //     socket.emit('disable buttons');
-        // }
     });
 
     socket.on('chat message', function(msg) {
@@ -49,7 +46,7 @@ io.on('connection', function(socket){
             turns = 0;
             lastCardDrawX = false;
             drawTotal = 0;
-            
+
             io.emit('disable draw buttons');
     
             // Could combine these two into their own function. Note for later.
