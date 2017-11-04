@@ -24,10 +24,16 @@ var drawTotal = 0;
 
 io.on('connection', function(socket){
     socket.on('new user', function(name) {
+        numPlayers++;
         io.emit('message', name + ' has connected.');
         socket.username = name;
         players.push({"id": socket.id, "username": socket.username});
-        numPlayers++;
+        if (turns > 0) {
+            socket.emit('disable new game button');
+        }
+        // if (!isPlayerTurn(socket.id)) {
+        //     socket.emit('disable buttons');
+        // }
     });
 
     socket.on('chat message', function(msg) {
@@ -44,6 +50,7 @@ io.on('connection', function(socket){
     socket.on('new game', function() {
         if (turns == 0) {
             io.emit('message', socket.username + " started a new game.");
+            io.emit('disable new game button');
             // Get a shuffled uno deck
             unoDeck = deckHandler();
             var tempCard = unoDeck.pop();
@@ -122,6 +129,8 @@ io.on('connection', function(socket){
 
         if (isPlayerTurn(socket.id)) {
             if (lastCardDrawX && card.value != "draw two" && card.value != "draw four") {
+                // Automatically draws drawTotal amount of cards if player attempts to play
+                // a card that is not a draw two or draw four.
                 // socket.emit('card get', card);
                 // for (var i = 0; i < drawTotal; i++) {
                 //     var tempCard = cardDrawHandler();
@@ -205,15 +214,23 @@ io.on('connection', function(socket){
 
     socket.on('call uno', function() {
         io.emit('message', socket.username + " has called Uno!");
+        io.emit('disable uno button');
     });
     
     socket.on('uno', function() {
         io.emit('message', socket.username + " has Uno!");
+        io.emit('enable uno button');
     });
     
     socket.on('victory', function() { 
         io.emit('message', socket.username + " has won. Congratulations!");
         io.emit('card clear');
+        io.emit('disable draw buttons');
+
+        // Could combine these two into their own function. Note for later.
+        io.emit('enable draw 7 button');
+        io.emit('enable new game button');
+
         turns = 0;
         drawTotal = 0;
         lastCardDrawX = false;
@@ -259,8 +276,10 @@ function isPlayerTurn(id) {
  * Relays a global message indicating which player's turn it is.
  */
 function whosTurn() {
-    var user = players[turns % numPlayers].username;
-    io.emit('message', user + "'s turn.");
+    var player = players[turns % numPlayers];
+    io.emit('message', player.username + "'s turn.");
+    io.emit('disable draw buttons');
+    io.to(player.id).emit('enable draw buttons');
 }
 
 /**

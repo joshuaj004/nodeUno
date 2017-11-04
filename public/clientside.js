@@ -59,6 +59,7 @@ $(function () {
 
     $("#draw7Cards").click(function() {
         socket.emit('card get x', 7);
+        $("#draw7Cards").prop('disabled', true);
     });
 
     // Call uno
@@ -87,7 +88,6 @@ $(function () {
                 var tempLi = e.target;
             }
             var card = JSON.parse(tempLi.innerText);
-            console.log(card);
             // Prompts the user to pick a color on wild card.
             // Sends to server to persist change.
             if (card.value == "wild" || card.value == "draw four") {
@@ -142,6 +142,46 @@ $(function () {
 
     socket.on('card clear', function(msg){
        $('#cards').empty(); 
+    });
+
+    socket.on('enable draw buttons', function() {
+        $("#drawCard").prop('disabled', false);
+        $("#draw2Cards").prop('disabled', false);
+        $("#draw4Cards").prop('disabled', false);
+        $("#draw7Cards").prop('disabled', false);
+    });
+
+    socket.on('disable draw buttons', function() {
+        $("#drawCard").prop('disabled', true);
+        $("#draw2Cards").prop('disabled', true);
+        $("#draw4Cards").prop('disabled', true);
+        $("#draw7Cards").prop('disabled', true);
+    });
+
+    socket.on('enable new game button', function() {
+        $("#newGame").prop('disabled', false);
+    });
+
+    socket.on('disable new game button', function() {
+        $("#newGame").prop('disabled', true);
+    });
+
+    socket.on('enable draw 7 button', function() {
+        $("#draw7Cards").prop('disabled', false);
+    })
+
+    // Possibly used for a drawTotal button to make for
+    // cleaner and clearer gameplay.
+    socket.on('enable draw x button', function(x) {
+        $("#draw" + x + "Cards").prop('disabled', false);
+    });
+
+    socket.on('enable uno button', function() {
+        $("#unoCall").prop('disabled', false);
+    });
+
+    socket.on('disable uno button', function() {
+        $("#unoCall").prop('disabled', true);
     });
 
     /**
