@@ -45,6 +45,17 @@ io.on('connection', function(socket){
         var index = players.findIndex(i => i.id === socket.id);
         players.splice(index, 1);
         numPlayers--;
+        if (numPlayers < 1) {
+            turns = 0;
+            lastCardDrawX = false;
+            drawTotal = 0;
+            
+            io.emit('disable draw buttons');
+    
+            // Could combine these two into their own function. Note for later.
+            io.emit('enable draw 7 button');
+            io.emit('enable new game button');
+        }
     });
     
     socket.on('new game', function() {
