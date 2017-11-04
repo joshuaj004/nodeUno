@@ -166,7 +166,8 @@ $(function () {
         $("#newGame").prop('disabled', true);
     });
 
-    socket.on('enable draw 7 button', function() {
+    socket.on('enable new/draw7 buttons', function() {
+        $("#newGame").prop('disabled', false);
         $("#draw7Cards").prop('disabled', false);
     });
 
