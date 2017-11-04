@@ -168,7 +168,7 @@ $(function () {
 
     socket.on('enable draw 7 button', function() {
         $("#draw7Cards").prop('disabled', false);
-    })
+    });
 
     // Possibly used for a drawTotal button to make for
     // cleaner and clearer gameplay.
