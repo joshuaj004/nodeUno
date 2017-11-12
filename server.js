@@ -15,6 +15,9 @@ var playedCards = [];
 var players = [];
 var numPlayers = 0;
 var turns = 0;
+
+// Keeps track of the number of cards the next player
+// must draw, or if they need to play a draw two/four
 var lastCardDrawX = false;
 var drawTotal = 0;
 
@@ -67,6 +70,7 @@ io.on('connection', function(socket){
         if (turns == 0) {
             io.emit('message', socket.username + " started a new game.");
             io.emit('disable new game button');
+            io.emit('disable uno button');
             // Get a shuffled uno deck
             unoDeck = deckHandler();
             var tempCard = unoDeck.pop();
@@ -141,24 +145,17 @@ io.on('connection', function(socket){
             return;
         }
         
+        if (playedCards.length == 0) {
+            socket.emit('card get', card);
+            return;
+        }
+        
         var lastPlayed = playedCards.slice(-1)[0];
 
         if (isPlayerTurn(socket.id)) {
+            // Handles user playing a card that isn't a draw two
+            // or draw four when drawTotal is greater than 0
             if (lastCardDrawX && card.value != "draw two" && card.value != "draw four") {
-                // Automatically draws drawTotal amount of cards if player attempts to play
-                // a card that is not a draw two or draw four.
-                // socket.emit('card get', card);
-                // for (var i = 0; i < drawTotal; i++) {
-                //     var tempCard = cardDrawHandler();
-                //     socket.emit('card get', tempCard);
-                // }
-                // io.emit('message', socket.username + " drew " + drawTotal + " cards.");
-                // lastCardDrawX = false;
-                // drawTotal = 0;
-                // turns++;
-                // whosTurn();
-                // return;
-
                 io.emit('message', socket.username + " tried to play a " + card.color + " " + card.value + ". They must either play a draw two, a draw four, or draw " + drawTotal + " cards.");
                 socket.emit('card get', card);
                 return;
@@ -242,6 +239,7 @@ io.on('connection', function(socket){
         io.emit('message', socket.username + " has won. Congratulations!");
         io.emit('card clear');
         io.emit('disable draw buttons');
+        io.emit('disable uno button');
 
         io.emit('enable new/draw7 buttons');
 

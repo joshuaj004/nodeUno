@@ -208,7 +208,10 @@ $(function () {
         } else {
             var cardNum = card.value;
         }
-        return "/(" + cardNum + ").jpeg";
+
+        var color = getColor(card);
+        return "/" + color + "/(" + cardNum + ").jpeg";
+        // return "/(" + cardNum + ").jpeg";
     }
 
     /**
@@ -216,11 +219,12 @@ $(function () {
      * @param {Object} card 
      */
     function getColor(card) {
-        if (card.value != "wild" && card.value != "draw four") {
-            return card.color;
-        } else {
-            return '';
-        }
+        // if (card.value != "wild" && card.value != "draw four") {
+        //     return card.color;
+        // } else {
+        //     return '';
+        // }
+        return card.color;
     }
 
     /**
