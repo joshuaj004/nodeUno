@@ -13,8 +13,9 @@ app.use(express.static('public'));
 var unoDeck = [];
 var playedCards = [];
 var players = [];
-var numPlayers = 0;
 var turns = 0;
+var gameInProgress = false;
+// var numPlayers = 0;
 
 // Keeps track of the number of cards the next player
 // must draw, or if they need to play a draw two/four
@@ -27,11 +28,11 @@ var drawTotal = 0;
 
 io.on('connection', function(socket){
     socket.on('new user', function(name) {
-        numPlayers++;
+        // numPlayers++;
         io.emit('message', name + ' has connected.');
         socket.username = name;
         players.push({"id": socket.id, "username": socket.username});
-        if (turns > 0) {
+        if (gameInProgress) {
             io.emit('disable new game button');
             whosTurn();
             
@@ -48,26 +49,25 @@ io.on('connection', function(socket){
         io.emit('message', socket.username + ' has disconnected.');
         var index = players.findIndex(i => i.id === socket.id);
         players.splice(index, 1);
-        numPlayers--;
-        if (numPlayers < 1) {
+        
+        if (players.length <= 1) {
             turns = 0;
-            lastCardDrawX = false;
             drawTotal = 0;
+            lastCardDrawX = false;
+            gameInProgress = false;
 
+            io.emit('card clear');
             io.emit('disable draw buttons');
-    
             io.emit('enable new/draw7 buttons');
 
-            // Could combine these two into their own function. Note for later.
-            // io.emit('enable draw 7 button');
-            // io.emit('enable new game button');
-        } else if (turns > 0) {
+        } else if (gameInProgress) {
             whosTurn();
         }
     });
     
     socket.on('new game', function() {
         if (turns == 0) {
+            gameInProgress = true;
             io.emit('message', socket.username + " started a new game.");
             io.emit('disable new game button');
             io.emit('disable uno button');
@@ -88,6 +88,7 @@ io.on('connection', function(socket){
             if (lastCardDrawX) {
                 drawTotal = (tempCard.value == "draw two") ? 2 : 4;
             }
+            shuffle(players);
 
             whosTurn();
         } else {
@@ -192,7 +193,7 @@ io.on('connection', function(socket){
                 io.emit('display card', card);
                 if (card.value == "reverse") {
                     players.reverse();
-                    turns = players.length - (turns % numPlayers) - 1;
+                    turns = players.length - (turns % players.length) - 1;
                 } else if (card.value == "skip") {
                     turns++;
                 }
@@ -250,6 +251,7 @@ io.on('connection', function(socket){
         turns = 0;
         drawTotal = 0;
         lastCardDrawX = false;
+        gameInProgress = false;
     });
 });
 
@@ -285,18 +287,23 @@ function deckHandler() {
  * @param {String} id 
  */
 function isPlayerTurn(id) {
-    return id === players[turns % numPlayers].id;
+    return id === players[turns % players.length].id;
 }
 
 /**
  * Relays a global message indicating which player's turn it is.
  */
 function whosTurn() {
-    var player = players[turns % numPlayers];
+    var player = players[turns % players.length];
     io.emit('message', player.username + "'s turn.");
     io.emit('disable new game button');
     io.emit('disable draw buttons');
+    io.emit('hide drawTotal button');
     io.to(player.id).emit('enable draw buttons');
+    io.to(player.id).emit('notify');
+    if (lastCardDrawX && drawTotal > 4) {
+        io.to(player.id).emit('show drawTotal button', drawTotal);
+    }
 }
 
 /**
