@@ -1,4 +1,7 @@
 $(function () {
+    var names = [
+        "Doc", "Grumpy", "Happy", "Sleepy", "Dopey", "Bashful", "Sneezy", "Bobby", "Gambino", "Dwight", "Egbert", "Eustace", "Cora", "Teddy", "Ursala"
+    ];
     var socket = io();
     // Handle username
     swal({
@@ -17,12 +20,12 @@ $(function () {
         }
     }).then(function (name) {
         if (!name) {
-            name = ["Doc", "Grumpy", "Happy", "Sleepy", "Dopey", "Bashful", "Sneezy"][Math.floor(Math.random() * 7)];
+            name = names[Math.floor(Math.random() * names.length)];
         }
         username = name;
         socket.emit('new user', username);
     }, function(dismiss) {
-        username = ["Doc", "Grumpy", "Happy", "Sleepy", "Dopey", "Bashful", "Sneezy"][Math.floor(Math.random() * 7)];
+        username = names[Math.floor(Math.random() * names.length)];
         socket.emit('new user', username);
     })
     
@@ -89,7 +92,6 @@ $(function () {
             }
             var card = JSON.parse(tempLi.innerText);
             // Prompts the user to pick a color on wild card.
-            // Sends to server to persist change.
             if (card.value == "wild" || card.value == "draw four") {
                 swal({
                     title: 'Select color',
@@ -211,7 +213,6 @@ $(function () {
 
         var color = getColor(card);
         return "/" + color + "/(" + cardNum + ").jpeg";
-        // return "/(" + cardNum + ").jpeg";
     }
 
     /**
@@ -219,11 +220,6 @@ $(function () {
      * @param {Object} card 
      */
     function getColor(card) {
-        // if (card.value != "wild" && card.value != "draw four") {
-        //     return card.color;
-        // } else {
-        //     return '';
-        // }
         return card.color;
     }
 

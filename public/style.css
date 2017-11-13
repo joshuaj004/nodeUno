@@ -20,22 +20,3 @@ li > img {
 body {
     padding: 25px;
 }
-
-/* .red {
-
-}
-
-.green {
-    -webkit-filter: hue-rotate(120deg);
-    filter: hue-rotate(120deg);
-}
-
-.blue {
-    -webkit-filter: hue-rotate(210deg);
-    filter: hue-rotate(210deg);
-}
-
-.yellow {
-    -webkit-filter: hue-rotate(40deg);
-    filter: hue-rotate(40deg);
-} */
