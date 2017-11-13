@@ -8,7 +8,7 @@ ul {
 }
 
 #cards > li {
-    font-size : 0px;
+    font-size: 0px;
     display: inline-block;
 }
 
@@ -19,4 +19,38 @@ li > img {
 
 body {
     padding: 25px;
+}
+
+/*
+    Used for notifying player of their turn.
+    Multiple classes for cross-browser compatibility.
+*/
+/* Default */
+@keyframes blink {
+    50% {
+        background: rgba(48, 230, 48, 0.534);
+        background-size: 75px 150px;
+    }
+}
+
+/* Safari */
+@-webkit-keyframes blink {
+    50% {
+        background: rgba(48, 230, 48, 0.534);
+        background-size: 75px 150px;
+    }
+}
+
+/* Firefox */
+@-moz-keyframes blink {
+    50% {
+        background: rgba(48, 230, 48, 0.534);
+        background-size: 75px 150px;
+    }
+}
+
+.notify {
+    animation: blink 1s;
+    -webkit-animation: blink 1s;
+    -moz-animation: blink 1s;
 }
