@@ -61,7 +61,7 @@ io.on('connection', function(socket){
             // Could combine these two into their own function. Note for later.
             // io.emit('enable draw 7 button');
             // io.emit('enable new game button');
-        } else {
+        } else if (turns > 0) {
             whosTurn();
         }
     });
