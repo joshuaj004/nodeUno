@@ -65,6 +65,13 @@ $(function () {
         $("#draw7Cards").prop('disabled', true);
     });
 
+    $("#drawTotalCards").click(function() {
+        var tempString = $("#drawTotalCards").text().replace(/[^\d.]/g, '');
+        var drawTotal = parseInt(tempString);
+        socket.emit('card get x', drawTotal);
+        socket.emit('hide drawTotal button');
+    });
+
     // Call uno
     $("#unoCall").click(function() {
         socket.emit('call uno');
@@ -124,6 +131,7 @@ $(function () {
             }
         });
         $('#cards').append(tempCard);
+        $('#cards').scrollTop($('#messages')[0].scrollHeight);
     });
 
     socket.on('display card', function(card) {
@@ -143,7 +151,8 @@ $(function () {
     });
 
     socket.on('card clear', function(msg){
-       $('#cards').empty(); 
+       $('#cards').empty();
+       $('#imageContainer').empty();
     });
 
     socket.on('enable draw buttons', function() {
@@ -185,6 +194,22 @@ $(function () {
 
     socket.on('disable uno button', function() {
         $("#unoCall").prop('disabled', true);
+    });
+
+    socket.on('show drawTotal button', function(x) {
+        $("#drawTotalCards").html("Draw " + x + " Cards");
+        $("#drawTotalCards").show();
+    });
+
+    socket.on('hide drawTotal button', function() {
+        $("#drawTotalCards").html("");
+        $("#drawTotalCards").hide();
+    });
+
+    // Flashes the screen to notify the player that it
+    // is their turn.
+    socket.on('notify', function() {
+        $('body').toggleClass('notify');
     });
 
     /**
