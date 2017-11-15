@@ -210,7 +210,20 @@ $(function () {
     // is their turn.
     socket.on('notify', function() {
         $('body').toggleClass('notify');
+        $.titleAlert("Your Turn!", {
+            requireBlur:true,
+            stopOnFocus:true,
+            interval:600
+        });
+        var ding = new Audio(getDing());
+        ding.play();
     });
+    
+    function getDing() {
+        var dingNums = 5;
+        var minDings = 1;
+        return "dings/ding" + (Math.floor(Math.random() * (dingNums - minDings + 1)) + minDings) + ".mp3";
+    }
 
     /**
      * Returns the corresponding number of the card to determine the image URL.
