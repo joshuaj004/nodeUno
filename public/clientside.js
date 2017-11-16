@@ -210,6 +210,7 @@ $(function () {
     // is their turn.
     socket.on('notify', function() {
         $('body').toggleClass('notify');
+        setTimeout(function() {$('body').toggleClass('notify');}, 1500);
     });
 
     /**
