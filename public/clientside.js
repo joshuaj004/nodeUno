@@ -1,4 +1,5 @@
 $(function () {
+    var soundEnabled = true;
     var names = [
         "Doc", "Grumpy", "Happy", "Sleepy", "Dopey", "Bashful", "Sneezy", "Bobby", "Gambino", "Dwight", "Egbert", "Eustace", "Cora", "Teddy", "Ursala"
     ];
@@ -80,6 +81,12 @@ $(function () {
     // Undo Card
     $("#undoCard").click(function() {
         socket.emit('card undo');
+    });
+    
+    // Enable/Disable Sound
+    $("#soundButton").click(function() {
+        $("#soundButton").html(soundEnabled ? "Enable Sound" : "Disable Sound");
+        soundEnabled = !soundEnabled;
     });
 
     socket.on('card get', function(card){
@@ -216,8 +223,10 @@ $(function () {
             stopOnFocus:true,
             interval:600
         });
-        var ding = new Audio(getDing());
-        ding.play();
+        if (soundEnabled) {
+            var ding = new Audio(getDing());
+            ding.play();
+        }
     });
     
     function getDing() {
